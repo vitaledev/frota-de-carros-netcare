@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netcare - Frota Operacional</title>
+    
+    <!-- Preconnect e DNS-Prefetch para o servidor de imagens -->
+    <link rel="preconnect" href="https://files.catbox.moe">
+    <link rel="dns-prefetch" href="https://files.catbox.moe">
+
+    <!-- Preload das imagens críticas (Acima da dobra) -->
+    <link rel="preload" as="image" href="https://files.catbox.moe/oh17x3.png" fetchpriority="high">
+    <link rel="preload" as="image" href="https://files.catbox.moe/wiudbm.png" fetchpriority="high">
+
+    <!-- Google Fonts: Ubuntu & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Ubuntu:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS (via CDN for single-file structure) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        netcare: {
+                            purple: '#390ea6',
+                            yellow: '#e5f034',
+                            light: '#f5f5f5',
+                        }
+                    },
+                    fontFamily: {
+                        ubuntu: ['Ubuntu', 'sans-serif'],
+                        inter: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS for specific animations and tweaks -->
+    <style>
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .font-ubuntu {
+            font-family: 'Ubuntu', sans-serif;
+        }
+
+        /* Habilita o efeito de "encaixe" na rolagem da tela considerando o cabeçalho de 80px */
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px; /* Offset rigoroso para o cabeçalho fixo */
+        }
+
+        .snap-section {
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+
+        /* Animation Classes */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Image pop animation */
+        .img-pop {
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .img-pop.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased flex flex-col pt-[80px]"> <!-- pt-[80px] garante que nada fique por baixo do cabeçalho no inicio -->
+
+    <!-- Header / Navbar -->
+    <header class="fixed w-full top-0 z-50 bg-netcare-light/95 backdrop-blur-md shadow-sm border-b border-gray-200 h-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+            <div class="flex justify-between items-center h-full">
+                <!-- Logo -->
+                <div class="flex-shrink-0 flex items-center">
+                    <img src="https://files.catbox.moe/wiudbm.png" alt="Netcare Logo" class="h-10 w-auto object-contain" fetchpriority="high">
+                </div>
+                
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex space-x-6 lg:space-x-8">
+                    <a href="#inicio" class="text-netcare-purple font-medium hover:text-netcare-yellow transition-colors duration-300">Início</a>
+                    <a href="#veiculos-leves" class="text-netcare-purple font-medium hover:text-netcare-yellow transition-colors duration-300">Veículos Leves</a>
+                    <a href="#fiorino" class="text-netcare-purple font-medium hover:text-netcare-yellow transition-colors duration-300">Fiorino</a>
+                    <a href="#sprinter" class="text-netcare-purple font-medium hover:text-netcare-yellow transition-colors duration-300">Sprinter</a>
+                    <a href="#caminhao" class="text-netcare-purple font-medium hover:text-netcare-yellow transition-colors duration-300">Caminhão Munck</a>
+                </nav>
+
+                <!-- CTA Button -->
+                <div class="hidden md:flex">
+                    <a href="#veiculos-leves" class="bg-netcare-purple text-white px-6 py-2 rounded-full font-medium hover:bg-opacity-90 transition-all duration-300 border-2 border-transparent hover:border-netcare-yellow">
+                        Ver Veículos
+                    </a>
+                </div>
+
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-netcare-purple hover:text-netcare-purple focus:outline-none p-2">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 absolute w-full left-0 shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="block px-3 py-2 rounded-md text-base font-medium text-netcare-purple hover:bg-gray-50 text-center">Início</a>
+                <a href="#veiculos-leves" class="block px-3 py-2 rounded-md text-base font-medium text-netcare-purple hover:bg-gray-50 text-center">Veículos Leves</a>
+                <a href="#fiorino" class="block px-3 py-2 rounded-md text-base font-medium text-netcare-purple hover:bg-gray-50 text-center">Fiorino</a>
+                <a href="#sprinter" class="block px-3 py-2 rounded-md text-base font-medium text-netcare-purple hover:bg-gray-50 text-center">Sprinter</a>
+                <a href="#caminhao" class="block px-3 py-2 rounded-md text-base font-medium text-netcare-purple hover:bg-gray-50 text-center">Caminhão Munck</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section (Capa) -->
+    <!-- Ajustado para object-cover e object-top: preenche sem bordas e mantém o topo sempre visível -->
+    <section id="inicio" class="snap-section relative h-[calc(100vh-80px)] w-full overflow-hidden bg-netcare-purple">
+        <img src="https://files.catbox.moe/oh17x3.png" alt="Netcare Capa" class="w-full h-full object-cover object-top" fetchpriority="high" decoding="sync">
+    </section>
+
+    <!-- Frota 1: Veículos Leves -->
+    <section id="veiculos-leves" class="snap-section relative min-h-[calc(100vh-80px)] w-full flex items-center justify-center bg-netcare-light overflow-hidden py-8">
+        <!-- Detalhe de fundo geométrico na direita para destacar o texto -->
+        <div class="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-white skew-x-12 translate-x-32 z-0 opacity-50"></div>
+        
+        <div class="max-w-[100rem] mx-auto px-4 sm:px-8 w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center z-10 h-full">
+            
+            <!-- Imagem (Esquerda - Gigante) -->
+            <div class="order-1 lg:order-1 col-span-12 lg:col-span-7 relative w-full h-[40vh] lg:h-[80vh] flex items-center justify-center img-pop p-2 lg:p-6">
+                <img src="https://files.catbox.moe/htg8he.png" alt="Veículo Leve" class="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-700" decoding="async">
+            </div>
+
+            <!-- Texto (Direita) -->
+            <div class="order-2 lg:order-2 col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left fade-in-up z-20">
+                <div class="flex items-center space-x-3 lg:space-x-4 mb-4 lg:mb-6">
+                    <span class="text-netcare-purple/20 font-bold text-6xl lg:text-8xl font-ubuntu leading-none">01</span>
+                    <div class="bg-netcare-yellow text-netcare-purple text-sm lg:text-lg font-bold px-6 py-2 lg:px-8 lg:py-3 rounded-full shadow-md transition-all duration-300 hover:scale-110 hover:-translate-y-1 cursor-default border border-transparent hover:border-netcare-purple whitespace-nowrap">
+                        7 UNIDADES
+                    </div>
+                </div>
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-netcare-purple font-ubuntu mb-4 lg:mb-6 leading-tight">Veículos<br class="hidden lg:block">Leves</h2>
+                <p class="text-base sm:text-lg lg:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                    Agilidade urbana pura. Nossa frota base direcionada para vistorias técnicas, deslocamentos rápidos de coordenação e atendimentos de rotina.
+                </p>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- Frota 2: Fiorino -->
+    <section id="fiorino" class="snap-section relative min-h-[calc(100vh-80px)] w-full flex items-center justify-center bg-white overflow-hidden py-8">
+        <div class="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-netcare-light skew-x-12 translate-x-32 z-0 opacity-50"></div>
+
+        <div class="max-w-[100rem] mx-auto px-4 sm:px-8 w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center z-10 h-full">
+            
+            <!-- Imagem (Esquerda - Gigante) -->
+            <div class="order-1 lg:order-1 col-span-12 lg:col-span-7 relative w-full h-[40vh] lg:h-[80vh] flex items-center justify-center img-pop p-2 lg:p-6">
+                <img src="https://files.catbox.moe/yvyus4.png" alt="Fiorino" class="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async">
+            </div>
+
+            <!-- Texto (Direita) -->
+            <div class="order-2 lg:order-2 col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left fade-in-up z-20">
+                <div class="flex items-center space-x-3 lg:space-x-4 mb-4 lg:mb-6">
+                    <span class="text-netcare-purple/20 font-bold text-6xl lg:text-8xl font-ubuntu leading-none">02</span>
+                    <div class="bg-netcare-yellow text-netcare-purple text-sm lg:text-lg font-bold px-6 py-2 lg:px-8 lg:py-3 rounded-full shadow-md transition-all duration-300 hover:scale-110 hover:-translate-y-1 cursor-default border border-transparent hover:border-netcare-purple whitespace-nowrap">
+                        4 UNIDADES
+                    </div>
+                </div>
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-netcare-purple font-ubuntu mb-4 lg:mb-6 leading-tight">Fiorino</h2>
+                <p class="text-base sm:text-lg lg:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                    Versatilidade em campo. Utilitários compactos, ideais para o transporte seguro de ferramentas, materiais e equipamentos de manutenção diária.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Frota 3: Sprinter -->
+    <section id="sprinter" class="snap-section relative min-h-[calc(100vh-80px)] w-full flex items-center justify-center bg-netcare-light overflow-hidden py-8">
+        <div class="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-netcare-purple/5 skew-x-12 translate-x-32 z-0"></div>
+
+        <div class="max-w-[100rem] mx-auto px-4 sm:px-8 w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center z-10 h-full">
+            
+            <!-- Imagem (Esquerda - Gigante) -->
+            <div class="order-1 lg:order-1 col-span-12 lg:col-span-7 relative w-full h-[40vh] lg:h-[80vh] flex items-center justify-center img-pop p-2 lg:p-6">
+                <img src="https://files.catbox.moe/tvoew1.png" alt="Sprinter" class="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async">
+            </div>
+
+            <!-- Texto (Direita) -->
+            <div class="order-2 lg:order-2 col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left fade-in-up z-20">
+                <div class="flex items-center space-x-3 lg:space-x-4 mb-4 lg:mb-6">
+                    <span class="text-netcare-purple/20 font-bold text-6xl lg:text-8xl font-ubuntu leading-none">03</span>
+                    <div class="bg-netcare-yellow text-netcare-purple text-sm lg:text-lg font-bold px-6 py-2 lg:px-8 lg:py-3 rounded-full shadow-md transition-all duration-300 hover:scale-110 hover:-translate-y-1 cursor-default border border-transparent hover:border-netcare-purple whitespace-nowrap">
+                        1 UNIDADE
+                    </div>
+                </div>
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-netcare-purple font-ubuntu mb-4 lg:mb-6 leading-tight">Sprinter</h2>
+                <p class="text-base sm:text-lg lg:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                    Espaço e capacidade. Van de alta performance configurada para equipes maiores e acondicionamento de equipamentos sensíveis de grande porte.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Frota 4: Caminhão Munck -->
+    <section id="caminhao" class="snap-section relative min-h-[calc(100vh-80px)] w-full flex items-center justify-center bg-white overflow-hidden py-8">
+        <div class="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-netcare-yellow/10 skew-x-12 translate-x-32 z-0"></div>
+
+        <div class="max-w-[100rem] mx-auto px-4 sm:px-8 w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12 items-center justify-center z-10 h-full">
+            
+            <!-- Imagem (Esquerda - Gigante) -->
+            <div class="order-1 lg:order-1 col-span-12 lg:col-span-7 relative w-full h-[40vh] lg:h-[80vh] flex items-center justify-center img-pop p-2 lg:p-6">
+                <img src="https://files.catbox.moe/fkpbtq.png" alt="Caminhão Munck" class="w-full h-full object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)] hover:scale-105 transition-transform duration-700" loading="lazy" decoding="async">
+            </div>
+
+            <!-- Texto (Direita) -->
+            <div class="order-2 lg:order-2 col-span-12 lg:col-span-5 flex flex-col items-center lg:items-start text-center lg:text-left fade-in-up z-20">
+                <div class="flex items-center space-x-3 lg:space-x-4 mb-4 lg:mb-6">
+                    <span class="text-netcare-purple/20 font-bold text-6xl lg:text-8xl font-ubuntu leading-none">04</span>
+                    <div class="bg-netcare-yellow text-netcare-purple text-sm lg:text-lg font-bold px-6 py-2 lg:px-8 lg:py-3 rounded-full shadow-md transition-all duration-300 hover:scale-110 hover:-translate-y-1 cursor-default border border-transparent hover:border-netcare-purple whitespace-nowrap">
+                        2 UNIDADES
+                    </div>
+                </div>
+                <h2 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-netcare-purple font-ubuntu mb-4 lg:mb-6 leading-tight">Caminhão<br class="hidden lg:block">Munck</h2>
+                <p class="text-base sm:text-lg lg:text-2xl text-gray-600 max-w-xl leading-relaxed">
+                    Força bruta e robustez. Veículos pesados indispensáveis para operações de içamento, movimentação de postes e infraestrutura de telecomunicações.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="snap-section bg-netcare-purple text-netcare-light py-10 border-t-[6px] border-netcare-yellow flex flex-col justify-center">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0 w-full">
+            <!-- Esquerda: Logo -->
+            <div class="flex-1 flex flex-col items-center md:items-start w-full">
+                <div class="bg-white/10 p-3 rounded-lg mb-3 hover:bg-white/20 transition-colors">
+                    <img src="https://files.catbox.moe/wiudbm.png" alt="Netcare Logo" class="h-6 object-contain brightness-0 invert" loading="lazy" decoding="async">
+                </div>
+                <p class="text-xs sm:text-sm text-gray-300">Construindo as redes do futuro.</p>
+            </div>
+            
+            <!-- Centro: Links -->
+            <div class="flex-1 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-gray-300 w-full">
+                <a href="#inicio" class="hover:text-netcare-yellow transition-colors">Início</a>
+                <a href="#veiculos-leves" class="hover:text-netcare-yellow transition-colors">Veículos Leves</a>
+                <a href="#fiorino" class="hover:text-netcare-yellow transition-colors">Fiorino</a>
+                <a href="#sprinter" class="hover:text-netcare-yellow transition-colors">Sprinter</a>
+                <a href="#caminhao" class="hover:text-netcare-yellow transition-colors">Caminhão Munck</a>
+            </div>
+
+            <!-- Direita: Direitos -->
+            <div class="flex-1 text-xs sm:text-sm text-gray-400 text-center md:text-right w-full mt-6 md:mt-0">
+                <p>&copy; <span id="year"></span> Netcare. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript para Interações -->
+    <script>
+        // Set current year in footer
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Fechar menu mobile ao clicar em um link
+        const mobileLinks = menu.querySelectorAll('a');
+        mobileLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // FIX DEFINITIVO: Scroll suave forçado respeitando matematicamente os 80px do cabeçalho
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const headerOffset = 80; // Exatos 80px do cabeçalho
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for Scroll Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.2
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observar elementos de texto
+        document.querySelectorAll('.fade-in-up').forEach((el) => {
+            observer.observe(el);
+        });
+
+        // Observar imagens
+        document.querySelectorAll('.img-pop').forEach((el) => {
+            observer.observe(el);
+        });
+    </script>
+
+</body>
+</html>
